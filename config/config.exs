@@ -11,6 +11,12 @@ config :fluffy_octo_robot,
   ecto_repos: [FluffyOctoRobot.Repo],
   generators: [timestamp_type: :utc_datetime]
 
+config :exq,
+  name: FluffyOctoRobot.Exq,
+  host: "127.0.0.1",
+  port: 6379,
+  queues: ["default"]
+
 # Configures the endpoint
 config :fluffy_octo_robot, FluffyOctoRobotWeb.Endpoint,
   url: [host: "localhost"],
