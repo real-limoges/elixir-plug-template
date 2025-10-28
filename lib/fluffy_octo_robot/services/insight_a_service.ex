@@ -2,7 +2,7 @@ defmodule FluffyOctoRobot.Services.InsightAService do
   @moduledoc "This is a stub of a service, where some business logic would go."
 
   alias FluffyOctoRobot.Pipeline
-  alias FluffyOctoRobot.Workers.TaskWorker
+  alias FluffyOctoRobot.Worker.TaskWorker
 
   @queue_name "default"
 
@@ -11,10 +11,11 @@ defmodule FluffyOctoRobot.Services.InsightAService do
       job_payload = %{
         job_type: "insight_a",
         model_name: "insight_a_model",
+        user_id: user_id,
         data: feature_vector
       }
 
-      Exq.enqueue!(TaskWorker, @queue_name, [job_payload])
+      Exq.enqueue(Exq, TaskWorker, [job_payload], [queue: @queue_name])
 
       {:ok, %{job_type: "insight_a", user_id: user_id}}
     end

@@ -5,12 +5,23 @@ defmodule FluffyOctoRobot.MixProject do
     [
       app: :fluffy_octo_robot,
       version: "0.1.0",
-      elixir: "~> 1.15",
+      elixir: "~> 1.19",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
       deps: deps(),
-      listeners: [Phoenix.CodeReloader]
+      listeners: [Phoenix.CodeReloader],
+      dialyzer: [
+        flags: {
+          :overspecs,
+          :underspecs,
+          :error_handling,
+          :specdiffs,
+          :extra_return,
+          :missing_return,
+          :unknown
+        }
+      ]
     ]
   end
 
@@ -20,7 +31,7 @@ defmodule FluffyOctoRobot.MixProject do
   def application do
     [
       mod: {FluffyOctoRobot.Application, []},
-      extra_applications: [:logger, :runtime_tools]
+      extra_applications: [:logger, :runtime_tools, :exq]
     ]
   end
 
@@ -52,7 +63,12 @@ defmodule FluffyOctoRobot.MixProject do
       {:jason, "~> 1.2"},
       {:dns_cluster, "~> 0.2.0"},
       {:bandit, "~> 1.5"},
-      {:exq, "~> 0.11.0"},
+      {:exq, "~> 0.22.0"},
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
+      {:nx, "~> 0.7"},
+      {:explorer, "~> 0.8"},
+      {:dialyxir, "~> 1.4", only: [:dev, :test], runtime: false},
+
     ]
   end
 

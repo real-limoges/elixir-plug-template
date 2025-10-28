@@ -11,6 +11,7 @@ defmodule FluffyOctoRobotWeb.TaskController do
             conn
             |> put_status(:accepted)
             |> json(%{status: "ok", result: result})
+
         {:error, reason} ->
             handle_error(conn, reason)
       end
@@ -22,6 +23,7 @@ defmodule FluffyOctoRobotWeb.TaskController do
             conn
             |> put_status(:accepted)
             |> json(%{status: "ok", result: result})
+
         {:error, reason} ->
             handle_error(conn, reason)
       end
@@ -29,11 +31,22 @@ defmodule FluffyOctoRobotWeb.TaskController do
 
     # error helpers
     defp handle_error(conn, :not_found), do:
-        conn |> put_status(:not_found) |> json(%{error: "User data not found"})
+        conn
+        |> put_status(:not_found)
+        |> json(%{error: "User data not found"})
+
     defp handle_error(conn, :invalid_query_type), do:
-        conn |> put_status(:bad_request) |> json(%{error: "Invalid query type"})
+        conn
+        |> put_status(:bad_request)
+        |> json(%{error: "Invalid query type"})
+
     defp handle_error(conn, reason) when is_binary(reason), do:
-        conn |> put_status(:unprocessable_entity) |> json(%{error: "Failed to process data: #{reason}"})
+        conn
+        |> put_status(:unprocessable_entity)
+        |> json(%{error: "Failed to process data: #{reason}"})
+
     defp handle_error(conn, reason), do:
-        conn |> put_status(:internal_server_error) |> json(%{error: inspect(reason)})
+        conn
+        |> put_status(:internal_server_error)
+        |> json(%{error: inspect(reason)})
 end
