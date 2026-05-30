@@ -1,11 +1,24 @@
-# Script for populating the database. You can run it as:
+# Populates the database with a sample user so the example flow returns data.
 #
 #     mix run priv/repo/seeds.exs
 #
-# Inside the script, you can read and write to any of your
-# repositories directly:
-#
-#     FluffyOctoRobot.Repo.insert!(%FluffyOctoRobot.SomeSchema{})
-#
-# We recommend using the bang functions (`insert!`, `update!`
-# and so on) as they will fail if something goes wrong.
+# It is idempotent: running it repeatedly will not create duplicate users. The
+# user is inserted with id 1 so the documented `curl` (user_id: 1) works.
+
+alias Relay.Repo
+alias Relay.User
+
+now = DateTime.utc_now() |> DateTime.truncate(:second)
+
+case Repo.get(User, 1) do
+  nil ->
+    Repo.insert!(%User{
+      id: 1,
+      created_at: now,
+      updated_at: now,
+      last_active: now
+    })
+
+  _user ->
+    :ok
+end

@@ -1,34 +1,29 @@
-defmodule FluffyOctoRobot.DataCase do
+defmodule Relay.DataCase do
   @moduledoc """
-  This module defines the setup for tests requiring
-  access to the application's data layer.
+  Test case for tests that touch the database.
 
-  You may define functions here to be used as helpers in
-  your tests.
-
-  Finally, if the test case interacts with the database,
-  we enable the SQL sandbox, so changes done to the database
-  are reverted at the end of every test. If you are using
-  PostgreSQL, you can even run database tests asynchronously
-  by setting `use FluffyOctoRobot.DataCase, async: true`, although
-  this option is not recommended for other databases.
+  Enables the Ecto SQL sandbox so each test runs in its own transaction and is
+  rolled back at the end. Use `async: true` for tests that don't share state.
+  Also provides small fixtures used across the suite.
   """
 
   use ExUnit.CaseTemplate
 
+  alias Ecto.Adapters.SQL.Sandbox
+
   using do
     quote do
-      alias FluffyOctoRobot.Repo
+      alias Relay.Repo
 
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      import FluffyOctoRobot.DataCase
+      import Relay.DataCase
     end
   end
 
   setup tags do
-    FluffyOctoRobot.DataCase.setup_sandbox(tags)
+    Relay.DataCase.setup_sandbox(tags)
     :ok
   end
 
@@ -36,23 +31,21 @@ defmodule FluffyOctoRobot.DataCase do
   Sets up the sandbox based on the test tags.
   """
   def setup_sandbox(tags) do
-    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(FluffyOctoRobot.Repo, shared: not tags[:async])
-    on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
+    pid = Sandbox.start_owner!(Relay.Repo, shared: not tags[:async])
+    on_exit(fn -> Sandbox.stop_owner(pid) end)
   end
 
   @doc """
-  A helper that transforms changeset errors into a map of messages.
-
-      assert {:error, changeset} = Accounts.create_user(%{password: "short"})
-      assert "password is too short" in errors_on(changeset).password
-      assert %{password: ["password is too short"]} = errors_on(changeset)
-
+  Inserts a `Relay.User` with all timestamp fields populated and returns it.
   """
-  def errors_on(changeset) do
-    Ecto.Changeset.traverse_errors(changeset, fn {message, opts} ->
-      Regex.replace(~r"%{(\w+)}", message, fn _, key ->
-        opts |> Keyword.get(String.to_existing_atom(key), key) |> to_string()
-      end)
-    end)
+  def insert_user(attrs \\ %{}) do
+    now = DateTime.utc_now() |> DateTime.truncate(:second)
+
+    %Relay.User{
+      created_at: Map.get(attrs, :created_at, now),
+      updated_at: Map.get(attrs, :updated_at, now),
+      last_active: Map.get(attrs, :last_active, now)
+    }
+    |> Relay.Repo.insert!()
   end
 end

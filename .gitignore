@@ -7,7 +7,7 @@
 erl_crash.dump
 *.ez
 /tmp/
-fluffy_octo_robot-*.tar
+relay-*.tar
 *.beam
 /config/*.secret.exs
 .elixir_ls/
